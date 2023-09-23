@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "module": "commonjs",
+    "target": "es6",
+    "types": [
+      "node",
+    ],
+    "lib": [
+      "ESNext",
+    ],
+  },
+  "exclude": [
+    "node_modules/",
+    "dist/",
+    "./*.ts",
+    "**/*.test.ts",
+  ],
+}

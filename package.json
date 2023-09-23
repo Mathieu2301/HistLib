@@ -1,0 +1,25 @@
+{
+  "name": "histlib",
+  "description": "Library for incremental histogram calculation.",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "tsc",
+    "test": "vitest",
+    "playground": "nodemon --ignore '*.json' playground.ts"
+  },
+  "repository": "https://github.com/Mathieu2301/HistLib",
+  "author": "Mathieu Colmon <mathieu@colmon.fr>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "big.js": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.2.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.5"
+  }
+}

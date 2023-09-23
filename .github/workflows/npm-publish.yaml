@@ -1,0 +1,22 @@
+name: Publish on NPM
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn config set version-git-tag false
+      - run: yarn config set version-tag-prefix ""
+      - run: yarn publish --new-version ${{ github.event.release.tag_name }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
