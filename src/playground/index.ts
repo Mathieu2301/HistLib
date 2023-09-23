@@ -184,7 +184,7 @@ export namespace playground {
       useQuantiles,
     };
   }
-};
+}
 
 function parseFile<Schema>(file: string): Schema[] {
   try {
