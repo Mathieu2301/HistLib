@@ -36,7 +36,7 @@ describe('Histogram', () => {
   test('step by step', () => {
     const values: number[] = [];
 
-    let encodedHistData: EncodedHistData<any>;
+    let encodedHistData: EncodedHistData<HistStrategy>;
 
     /**
      * 1. On crée un histogramme vide

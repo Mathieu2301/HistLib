@@ -61,7 +61,7 @@ export namespace playground {
         useStrategies,
         compute,
       };
-    };
+    }
 
     function useQuantiles(quantiles: number[]) {
       console.log(`  Using quantiles: ${quantiles.join('%, ')}%`);
@@ -74,7 +74,7 @@ export namespace playground {
         useStrategies,
         compute,
       };
-    };
+    }
 
     function useStrategies<S extends Record<string, HistStrategy>>(strategies: S) {
       console.log(`  Using strategies:\n   - ${Object.keys(strategies).join('\n   - ')}`);
@@ -85,7 +85,7 @@ export namespace playground {
         useQuantiles,
         compute: compute<S>,
       };
-    };
+    }
 
     let results = {} as ReturnType<typeof processStrategiesComparison>;
 
@@ -99,7 +99,7 @@ export namespace playground {
         log,
         logDistribution: logDistribution<S>,
       };
-    };
+    }
 
     function log() {
       if (!results) {
@@ -184,112 +184,112 @@ export namespace playground {
       useQuantiles,
     };
   }
-
-  function parseFile<Schema>(file: string): Schema[] {
-    try {
-      return JSON.parse(file);
-    } catch {
-      const fileContent = (file.length > 160
-        ? `${file.slice(0, 80)}...${file.slice(-80)}`
-        : (file.length > 80
-          ? `${file.slice(0, 80)}...`
-          : file
-        )
-      );
-
-      console.error(`Error parsing file '${fileContent}'`);
-      process.exit(1);
-    }
-  }
-
-  function processStrategiesComparison(options: {
-    values: number[];
-    quantiles: number[];
-    strategies: Record<string, HistStrategy>;
-  }) {
-    const strategies: Record<string, HistStrategy> = {
-      'REFERENCE': { type: 'LINEAR', step: 0 },
-      ...options.strategies,
-    } as const;
-
-    const reference = Histogram.create(strategies.REFERENCE);
-    for (const value of options.values) reference.add(value);
-
-    const results: Record<keyof typeof strategies, ReturnType<typeof analyzeStrategy>> = {} as any;
-
-    for (const [name, strategy] of Object.entries(strategies)) {
-      results[name] = analyzeStrategy({ strategy, reference, ...options });
-    }
-
-    return results;
-  }
-
-  function analyzeStrategy({ strategy, quantiles, values, reference: ref }: {
-    values: number[];
-    quantiles: number[];
-    strategy: HistStrategy;
-    reference: Histogram<HistStrategy>;
-  }) {
-    const hist = Histogram.create(strategy);
-    for (const value of values) hist.add(value);
-
-    const encodedHistData = hist.toBinary();
-    const qValues = hist.genQuantiles(quantiles);
-    const rqValues = ref.genQuantiles(quantiles);
-
-    function countVals(qVal: number, usedHist = hist) {
-      let count = 0;
-      for (const value of values) {
-        if (value >= qVal) count += 1;
-      }
-      return count;
-    }
-
-    type CompType = 'adiff' | 'rdiff' | 'rdiffp';
-    function comp(val: number, ref: number, type: CompType) {
-      if (val === ref) return '=';
-      const diff = Math.abs(val - ref);
-      const sign = (val > ref ? '+' : '-');
-
-      if (type === 'rdiff') return `x${(val / ref).toFixed(2)}`;
-      if (type === 'rdiffp') return `${sign}${(diff / ref * 100).toFixed(0)} %`;
-      if (type === 'adiff') return `${sign}${(diff < -1 || diff > 1) ? diff.toFixed(0) : ''}`;
-    }
-
-    function getMaxBucketSize({ hist }: Histogram<HistStrategy>) {
-      let max = 0;
-      for (let i = 0; i < hist.length; i += 2) {
-        max = Math.max(max, hist[i + 1]);
-      }
-      return max;
-    }
-
-    const maxBucketSize = getMaxBucketSize(hist);
-    const maxBucketSizeComp = comp(maxBucketSize, getMaxBucketSize(ref), 'rdiff');
-
-    const histSizeComp = comp(hist.histSize, ref.histSize, 'rdiffp');
-    const encodedHistSizeComp = comp(encodedHistData.hist.length, ref.toBinary().hist.length, 'rdiffp');
-
-    return {
-      /** Number of buckets in the histogram */
-      bucketCount: `${hist.histSize} (${histSizeComp})`,
-      /** Max bucket size */
-      maxBucketSize: `${maxBucketSize} (${maxBucketSizeComp})`,
-      /** Encoded histogram size in kilobytes */
-      encodedHistSize: `${(encodedHistData.hist.length / 1000).toFixed(2)} Kb (${encodedHistSizeComp})`,
-      /** Encoded histogram size in bytes per value */
-      encodedHistSizePerValue: `${(encodedHistData.hist.length / values.length).toFixed(2)} B`,
-
-      val: Object.fromEntries(quantiles.map((q) => [
-        `value(${q}%)`,
-        `${qValues[`${q}%`].toExponential(2)} (${comp(qValues[`${q}%`], rqValues[`${q}%`], 'adiff')})`,
-      ])),
-      count: Object.fromEntries(quantiles.map((q) => [
-        `count(${q}%)`,
-        `${countVals(qValues[`${q}%`])} (${comp(countVals(qValues[`${q}%`]), countVals(rqValues[`${q}%`], ref), 'adiff')})`,
-      ])),
-
-      hist,
-    };
-  }
 };
+
+function parseFile<Schema>(file: string): Schema[] {
+  try {
+    return JSON.parse(file);
+  } catch {
+    const fileContent = (file.length > 160
+      ? `${file.slice(0, 80)}...${file.slice(-80)}`
+      : (file.length > 80
+        ? `${file.slice(0, 80)}...`
+        : file
+      )
+    );
+
+    console.error(`Error parsing file '${fileContent}'`);
+    process.exit(1);
+  }
+}
+
+function processStrategiesComparison(options: {
+  values: number[];
+  quantiles: number[];
+  strategies: Record<string, HistStrategy>;
+}) {
+  const strategies: Record<string, HistStrategy> = {
+    'REFERENCE': { type: 'LINEAR', step: 0 },
+    ...options.strategies,
+  } as const;
+
+  const reference = Histogram.create(strategies.REFERENCE);
+  for (const value of options.values) reference.add(value);
+
+  const results: Record<keyof typeof strategies, ReturnType<typeof analyzeStrategy>> = {};
+
+  for (const [name, strategy] of Object.entries(strategies)) {
+    results[name] = analyzeStrategy({ strategy, reference, ...options });
+  }
+
+  return results;
+}
+
+function analyzeStrategy({ strategy, quantiles, values, reference: ref }: {
+  values: number[];
+  quantiles: number[];
+  strategy: HistStrategy;
+  reference: Histogram<HistStrategy>;
+}) {
+  const hist = Histogram.create(strategy);
+  for (const value of values) hist.add(value);
+
+  const encodedHistData = hist.toBinary();
+  const qValues = hist.genQuantiles(quantiles);
+  const rqValues = ref.genQuantiles(quantiles);
+
+  function countVals(qVal: number) {
+    let count = 0;
+    for (const value of values) {
+      if (value >= qVal) count += 1;
+    }
+    return count;
+  }
+
+  type CompType = 'adiff' | 'rdiff' | 'rdiffp';
+  function comp(val: number, ref: number, type: CompType) {
+    if (val === ref) return '=';
+    const diff = Math.abs(val - ref);
+    const sign = (val > ref ? '+' : '-');
+
+    if (type === 'rdiff') return `x${(val / ref).toFixed(2)}`;
+    if (type === 'rdiffp') return `${sign}${(diff / ref * 100).toFixed(0)} %`;
+    if (type === 'adiff') return `${sign}${(diff < -1 || diff > 1) ? diff.toFixed(0) : ''}`;
+  }
+
+  function getMaxBucketSize({ hist }: Histogram<HistStrategy>) {
+    let max = 0;
+    for (let i = 0; i < hist.length; i += 2) {
+      max = Math.max(max, hist[i + 1]);
+    }
+    return max;
+  }
+
+  const maxBucketSize = getMaxBucketSize(hist);
+  const maxBucketSizeComp = comp(maxBucketSize, getMaxBucketSize(ref), 'rdiff');
+
+  const histSizeComp = comp(hist.histSize, ref.histSize, 'rdiffp');
+  const encodedHistSizeComp = comp(encodedHistData.hist.length, ref.toBinary().hist.length, 'rdiffp');
+
+  return {
+    /** Number of buckets in the histogram */
+    bucketCount: `${hist.histSize} (${histSizeComp})`,
+    /** Max bucket size */
+    maxBucketSize: `${maxBucketSize} (${maxBucketSizeComp})`,
+    /** Encoded histogram size in kilobytes */
+    encodedHistSize: `${(encodedHistData.hist.length / 1000).toFixed(2)} Kb (${encodedHistSizeComp})`,
+    /** Encoded histogram size in bytes per value */
+    encodedHistSizePerValue: `${(encodedHistData.hist.length / values.length).toFixed(2)} B`,
+
+    val: Object.fromEntries(quantiles.map((q) => [
+      `value(${q}%)`,
+      `${qValues[`${q}%`].toExponential(2)} (${comp(qValues[`${q}%`], rqValues[`${q}%`], 'adiff')})`,
+    ])),
+    count: Object.fromEntries(quantiles.map((q) => [
+      `count(${q}%)`,
+      `${countVals(qValues[`${q}%`])} (${comp(countVals(qValues[`${q}%`]), countVals(rqValues[`${q}%`]), 'adiff')})`,
+    ])),
+
+    hist,
+  }
+}
